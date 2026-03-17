@@ -2,99 +2,87 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Ular Tangga Luar Biasa - Pixel GetRich</title>
+    <title>Pixel Tangga Luar Biasa - Fixed Edition</title>
     <style>
         :root { --bg-color: #1a1a2e; --panel-color: #16213e; --accent-color: #e94560; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; background: var(--bg-color); color: white; margin: 0; padding: 20px; justify-content: center; height: 100vh; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; background: var(--bg-color); color: white; margin: 0; padding: 20px; justify-content: center; height: 100vh; overflow: hidden; }
         
-        /* OVERLAY / MODAL (START, CHAR SELECT, WIN) */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .hidden { display: none !important; }
         
-        /* DESAIN KARAKTER PIXEL (CSS ONLY) */
+        /* KARAKTER PIXEL CSS */
         .pixel-char { width: 40px; height: 40px; image-rendering: pixelated; position: relative; cursor: pointer; transition: transform 0.2s; }
         .pixel-char:hover { transform: scale(1.1); }
         .char-selected { border: 4px solid gold; border-radius: 5px; box-shadow: 0 0 15px gold; }
 
-        /* Karakter 1: Wanita Berpayung (Gaya Pixel) */
         .char-umbrella {
             background: 
-                linear-gradient(to right, #f1c40f 20%, transparent 20%, transparent 80%, #f1c40f 80%), /* Payung Samping */
-                linear-gradient(to bottom, transparent 10%, #f1c40f 10%, #f1c40f 30%, transparent 30%), /* Payung Atas */
-                linear-gradient(to right, transparent 40%, #e67e22 40%, #e67e22 60%, transparent 60%), /* Gagang Payung */
-                linear-gradient(to right, transparent 30%, #3498db 30%, #3498db 70%, transparent 70%), /* Gaun */
-                linear-gradient(to bottom, transparent 60%, #3498db 60%, #3498db 90%, transparent 90%), /* Rok */
-                linear-gradient(to right, transparent 40%, #ffdbac 40%, #ffdbac 60%, transparent 60%); /* Kepala */
-            background-size: 100% 100%;
+                linear-gradient(to right, #f1c40f 20%, transparent 20%, transparent 80%, #f1c40f 80%),
+                linear-gradient(to bottom, transparent 10%, #f1c40f 10%, #f1c40f 30%, transparent 30%),
+                linear-gradient(to right, transparent 40%, #e67e22 40%, #e67e22 60%, transparent 60%),
+                linear-gradient(to right, transparent 30%, #3498db 30%, #3498db 70%, transparent 70%),
+                linear-gradient(to bottom, transparent 60%, #3498db 60%, #3498db 90%, transparent 90%),
+                linear-gradient(to right, transparent 40%, #ffdbac 40%, #ffdbac 60%, transparent 60%);
         }
 
-        /* Karakter 2: Panda (Gaya Pixel) */
         .char-panda {
             background: 
-                linear-gradient(to right, black 20%, transparent 20%, transparent 80%, black 80%), /* Telinga */
-                linear-gradient(to right, transparent 20%, white 20%, white 80%, transparent 80%), /* Wajah */
-                linear-gradient(to bottom, transparent 20%, white 20%, white 80%, transparent 80%), /* Wajah Tengah */
-                linear-gradient(to right, transparent 30%, black 30%, black 45%, transparent 45%, transparent 55%, black 55%, black 70%, transparent 70%), /* Mata */
-                linear-gradient(to right, transparent 45%, black 45%, black 55%, transparent 55%), /* Hidung */
-                linear-gradient(to right, black 100%, black 100%); /* Badan Putih default */
-            background-color: white;
-            border-radius: 5px;
+                linear-gradient(to right, black 20%, transparent 20%, transparent 80%, black 80%),
+                linear-gradient(to right, transparent 20%, white 20%, white 80%, transparent 80%),
+                linear-gradient(to bottom, transparent 20%, white 20%, white 80%, transparent 80%),
+                linear-gradient(to right, transparent 30%, black 30%, black 45%, transparent 45%, transparent 55%, black 55%, black 70%, transparent 70%),
+                linear-gradient(to right, transparent 45%, black 45%, black 55%, transparent 55%);
+            background-color: white; border-radius: 5px;
         }
 
-        /* PAPAN GAME */
-        #game-container { display: flex; gap: 40px; opacity: 1; transition: opacity 0.5s; }
-        #board-wrapper { position: relative; width: 600px; height: 600px; background: #fff; border: 8px solid #0f3460; border-radius: 10px; overflow: hidden; }
+        /* GAME BOARD */
+        #game-container { display: flex; gap: 30px; }
+        #board-wrapper { position: relative; width: 600px; height: 600px; background: #fff; border: 8px solid #0f3460; border-radius: 10px; }
         #board { display: grid; grid-template-columns: repeat(10, 60px); grid-template-rows: repeat(10, 60px); width: 100%; height: 100%; }
         #svg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-        
-        .cell { width: 60px; height: 60px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #ccc; font-weight: bold; }
+        .cell { width: 60px; height: 60px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #ccc; font-weight: bold; }
 
-        /* DADU GETRICH */
-        .dice-area { display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; perspective: 1000px; }
-        .cube { width: 60px; height: 60px; position: relative; transform-style: preserve-3d; transition: transform 1s cubic-bezier(0.2, 0.8, 0.3, 1.1); }
-        .cube div { position: absolute; width: 60px; height: 60px; background: white; border: 2px solid #ccc; color: black; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-radius: 10px; box-sizing: border-box; }
+        /* DADU 3D FIXED */
+        .dice-area { display: flex; gap: 30px; justify-content: center; margin-bottom: 25px; perspective: 1000px; }
+        .cube { width: 60px; height: 60px; position: relative; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1); }
+        .cube div { position: absolute; width: 60px; height: 60px; background: white; border: 2px solid #ddd; color: black; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-radius: 8px; box-sizing: border-box; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
         .action-cube div { background: var(--accent-color); color: white; border-color: #950740; }
         
-        /* Sisi Dadu */
-        .front { transform: translateZ(30px); } .back { transform: rotateY(180deg) translateZ(30px); }
-        .right { transform: rotateY(90deg) translateZ(30px); } .left { transform: rotateY(-90deg) translateZ(30px); }
-        .top { transform: rotateX(90deg) translateZ(30px); } .bottom { transform: rotateX(-90deg) translateZ(30px); }
+        /* Koordinat Sisi Dadu */
+        .side-1 { transform: translateZ(30px); }
+        .side-6 { transform: rotateY(180deg) translateZ(30px); }
+        .side-3 { transform: rotateY(90deg) translateZ(30px); }
+        .side-4 { transform: rotateY(-90deg) translateZ(30px); }
+        .side-2 { transform: rotateX(-90deg) translateZ(30px); }
+        .side-5 { transform: rotateX(90deg) translateZ(30px); }
 
-        /* KARTU */
-        .card-item { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 15px; border-radius: 12px; border: 2px solid gold; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
-        .card-item:hover { transform: scale(1.03); box-shadow: 0 0 15px gold; }
-
-        /* BIDAK PEMAIN (PIXEL) */
-        .player-token { width: 40px; height: 40px; position: absolute; z-index: 10; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); }
-
+        /* UI & KARTU */
+        .player-token { width: 40px; height: 40px; position: absolute; z-index: 10; transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1); filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         #ui-panel { width: 350px; background: var(--panel-color); padding: 20px; border-radius: 15px; border-left: 5px solid var(--accent-color); }
-        .btn-main { background: var(--accent-color); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; box-shadow: 0 5px #950740; transition: 0.1s; }
-        .btn-main:active { box-shadow: 0 0; transform: translateY(5px); }
-        .btn-main:disabled { background: #5d6d7e; box-shadow: none; cursor: not-allowed; }
+        .card-item { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 12px; border-radius: 10px; border: 2px solid gold; cursor: pointer; margin-bottom: 10px; }
+        .btn-main { background: var(--accent-color); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; box-shadow: 0 5px #950740; }
+        .btn-main:disabled { background: #444; box-shadow: none; opacity: 0.6; }
     </style>
 </head>
 <body>
 
 <div id="start-screen" class="overlay">
-    <h1 style="font-size: 50px; margin-bottom: 10px;">🎲 PIXEL TANGGA<br><span style="color:var(--accent-color)">LUAR BIASA</span></h1>
-    <p style="color: #bdc3c7; margin-bottom: 30px;">GetRich Style - 1 Pemain vs AI</p>
-    <button class="btn-main" onclick="showCharSelect()">PILIH KARAKTER</button>
+    <h1>🎲 PIXEL TANGGA<br><span style="color:var(--accent-color)">LUAR BIASA</span></h1>
+    <button class="btn-main" style="width:200px" onclick="showCharSelect()">PILIH KARAKTER</button>
 </div>
 
 <div id="char-screen" class="overlay hidden">
-    <h2 style="font-size: 32px; color: gold; margin-bottom: 30px;">PILIH KARAKTER KAMU</h2>
-    <div style="display: flex; gap: 40px; margin-bottom: 40px;">
+    <h2>PILIH KARAKTER</h2>
+    <div style="display: flex; gap: 40px; margin: 30px 0;">
         <div class="pixel-char char-umbrella" id="char-0" onclick="selectChar(0)"></div>
         <div class="pixel-char char-panda" id="char-1" onclick="selectChar(1)"></div>
     </div>
-    <p style="color: #bdc3c7; margin-bottom: 20px;">AI akan menggunakan karakter yang tidak kamu pilih.</p>
-    <button class="btn-main" id="btn-confirm" onclick="startGame()" disabled>KONFIRMASI & MULAI</button>
+    <button class="btn-main" id="btn-confirm" style="width:250px" onclick="startGame()" disabled>MULAI GAME</button>
 </div>
 
 <div id="win-screen" class="overlay hidden">
-    <div style="font-size: 48px; color: gold; text-shadow: 0 0 20px orange; margin-bottom: 20px;" id="winner-name">MENANG!</div>
-    <div class="pixel-char" id="winner-token" style="transform: scale(2); margin-bottom: 30px;"></div>
-    <button class="btn-main" onclick="location.reload()">MAIN LAGI</button>
+    <h1 id="winner-name" style="color:gold">MENANG!</h1>
+    <button class="btn-main" style="width:200px" onclick="location.reload()">MAIN LAGI</button>
 </div>
 
 <div id="game-container" class="hidden">
@@ -107,35 +95,33 @@
 
     <div id="ui-panel">
         <div class="dice-area">
-            <div class="cube" id="dice-num">
-                <div class="front">1</div><div class="back">6</div><div class="right">3</div><div class="left">4</div><div class="top">2</div><div class="bottom">5</div>
+            <div class="cube" id="cube-num">
+                <div class="side-1">1</div><div class="side-6">6</div><div class="side-3">3</div>
+                <div class="side-4">4</div><div class="side-2">2</div><div class="side-5">5</div>
             </div>
-            <div class="cube action-cube" id="dice-action">
-                <div class="front">⚡</div><div class="back">💀</div><div class="right">🃏</div><div class="left">🎯</div><div class="top">🛡️</div><div class="bottom">🔄</div>
+            <div class="cube action-cube" id="cube-act">
+                <div class="side-1">⚡</div><div class="side-6">💀</div><div class="side-3">🃏</div>
+                <div class="side-4">🎯</div><div class="side-2">🛡️</div><div class="side-5">🔄</div>
             </div>
         </div>
-
         <button class="btn-main" id="btn-roll" onclick="playTurn()">KOCOK DADU!</button>
-        <h3 id="turn-display" style="text-align:center; color:gold; margin-top: 15px;">Giliran: Pemain</h3>
-        <div id="card-list"></div>
-        <div id="log" style="margin-top: 15px; color: #00d2ff; font-size: 14px; text-align: center; font-style: italic;">Permainan Dimulai!</div>
+        <div id="card-list" style="margin-top:20px"></div>
+        <p id="log" style="text-align:center; color:cyan; font-size:14px"></p>
     </div>
 </div>
 
 <script>
-    let jumps = {};
-    let p1Pos = 1, p2Pos = 1;
-    let isProtected = false;
-    let playerCharIndex = -1;
-    let inventory = [
-        { title: "Tukar Nasib", desc: "Tukar posisimu dengan lawan secara instan!", type: "swap" },
-        { title: "Dorongan Maut", desc: "Dorong lawan mundur 5 langkah.", type: "push" }
+    let jumps = {}, p1Pos = 1, p2Pos = 1;
+    let isProtected = false, playerCharIdx = -1;
+    let rotNum = {x:0, y:0}, rotAct = {x:0, y:0};
+    
+    const charClasses = ['char-umbrella', 'char-panda'];
+    const inventory = [
+        { title: "Tukar Nasib", type: "swap", desc: "Tukar posisi dengan lawan." },
+        { title: "Dorongan Maut", type: "push", desc: "Lawan mundur 5 petak." }
     ];
 
-    // CSS Classes untuk karakter pixel
-    const charClasses = ['char-umbrella', 'char-panda'];
-
-    // Inisialisasi Papan
+    // Build Grid
     const board = document.getElementById('board');
     for (let i = 100; i >= 1; i--) {
         const cell = document.createElement('div');
@@ -150,156 +136,127 @@
         document.getElementById('char-screen').classList.remove('hidden');
     }
 
-    function selectChar(index) {
-        playerCharIndex = index;
-        // Hapus seleksi lama
+    function selectChar(idx) {
+        playerCharIdx = idx;
         document.querySelectorAll('.pixel-char').forEach(el => el.classList.remove('char-selected'));
-        // Tambah seleksi baru
-        document.getElementById('char-' + index).classList.add('char-selected');
-        // Aktifkan tombol konfirmasi
+        document.getElementById('char-' + idx).classList.add('char-selected');
         document.getElementById('btn-confirm').disabled = false;
     }
 
     function startGame() {
         document.getElementById('char-screen').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
+        document.getElementById('p1').classList.add(charClasses[playerCharIdx]);
+        document.getElementById('p2').classList.add(charClasses[1 - playerCharIdx]);
         
-        // Terapkan karakter pilihan
-        document.getElementById('p1').classList.add(charClasses[playerCharIndex]);
-        // AI pakai karakter yang sisa (0 jika player pilih 1, 1 jika player pilih 0)
-        document.getElementById('p2').classList.add(charClasses[1 - playerCharIndex]);
-
-        randomizeJumps(); // Buat ular tangga acak
-        moveBidak('p1', 1); moveBidak('p2', 1); // Set posisi awal
-        renderCards(); // Tampilkan kartu
+        randomizeJumps();
+        updateBidak();
+        renderCards();
     }
 
     function randomizeJumps() {
         jumps = {};
         for(let i=0; i<10; i++) {
-            let start = Math.floor(Math.random() * 85) + 5;
-            let end = Math.floor(Math.random() * 85) + 5;
-            if(Math.abs(start - end) > 15 && !jumps[start]) jumps[start] = end;
+            let s = Math.floor(Math.random()*85)+5, e = Math.floor(Math.random()*85)+5;
+            if(Math.abs(s-e)>15 && !jumps[s]) jumps[s] = e;
         }
         drawVisuals();
     }
 
     function drawVisuals() {
-        const svg = document.getElementById('svg-layer');
+        const svg = document.getElementById('svg-layer'), bR = board.getBoundingClientRect();
         svg.innerHTML = '';
-        const bRect = document.getElementById('board').getBoundingClientRect();
-        for (let start in jumps) {
-            let end = jumps[start];
-            let sR = document.getElementById('cell-'+start).getBoundingClientRect();
-            let eR = document.getElementById('cell-'+end).getBoundingClientRect();
-            let x1 = sR.left - bRect.left + 30, y1 = sR.top - bRect.top + 30;
-            let x2 = eR.left - bRect.left + 30, y2 = eR.top - bRect.top + 30;
-            let color = end > start ? "#2ecc71" : "#e74c3c"; // Hijau=Tangga, Merah=Ular
-            svg.innerHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="6" stroke-linecap="round" opacity="0.6" />`;
-            // Tambahkan bulatan kecil di tujuan agar jelas arahnya
-            svg.innerHTML += `<circle cx="${x2}" cy="${y2}" r="5" fill="${color}" />`;
+        for(let s in jumps) {
+            let e = jumps[s], sR = document.getElementById('cell-'+s).getBoundingClientRect(), eR = document.getElementById('cell-'+e).getBoundingClientRect();
+            let x1 = sR.left-bR.left+30, y1 = sR.top-bR.top+30, x2 = eR.left-bR.left+30, y2 = eR.top-bR.top+30;
+            let color = e > s ? "#2ecc71" : "#e74c3c";
+            svg.innerHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="6" stroke-linecap="round" opacity="0.5"/>`;
         }
     }
 
-    function rollDiceAnim(id, resultIndex) {
+    // FIXED DICE ANIMATION
+    function rollDice(id, resultIdx, isAction) {
         const cube = document.getElementById(id);
-        const rotations = [[0, 0], [0, 180], [0, -90], [0, 90], [-90, 0], [90, 0]];
-        let spin = 720 + (Math.random() * 360); // Putaran acak GetRich style
-        let rot = rotations[resultIndex];
-        cube.style.transform = `rotateX(${rot[0] + spin}deg) rotateY(${rot[1] + spin}deg)`;
+        const sides = [
+            [0,0], [90,0], [0,-90], [0,90], [-90,0], [0,180] // 1, 2, 3, 4, 5, 6
+        ];
+        let rot = isAction ? rotAct : rotNum;
+        rot.x += 720 + sides[resultIdx][0] - (rot.x % 360);
+        rot.y += 720 + sides[resultIdx][1] - (rot.y % 360);
+        cube.style.transform = `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
     }
 
     function playTurn() {
-        const btn = document.getElementById('btn-roll');
-        btn.disabled = true;
-        
-        let rIdx = Math.floor(Math.random() * 6), aIdx = Math.floor(Math.random() * 6);
-        let actions = ["⚡", "🛡️", "🃏", "🎯", "🔄", "💀"];
-        rollDiceAnim('dice-num', rIdx);
-        rollDiceAnim('dice-action', aIdx);
+        document.getElementById('btn-roll').disabled = true;
+        let r1 = Math.floor(Math.random()*6), r2 = Math.floor(Math.random()*6);
+        rollDice('cube-num', r1, false); rollDice('cube-act', r2, true);
 
         setTimeout(() => {
-            let roll = rIdx + 1, action = actions[aIdx], move = roll;
-            // Logika Dadu Aksi
-            if (action === "⚡") move += 2;
-            if (action === "🛡️") { isProtected = true; document.getElementById('log').innerText = "Shield Aktif!"; }
-            if (action === "🃏") { inventory.push({title:"Pawang Ular", desc:"Kebal ular pada giliran ini.", type:"shield"}); renderCards(); }
-            if (action === "💀") move = Math.max(1, move - 2);
-
+            let move = r1 + 1;
+            const acts = ["⚡", "🛡️", "🃏", "🎯", "🔄", "💀"];
+            let a = acts[r2];
+            if(a === "⚡") move += 2;
+            if(a === "🛡️") isProtected = true;
+            if(a === "💀") move = Math.max(1, move-2);
+            
             p1Pos = Math.min(100, p1Pos + move);
             checkJumps('p1');
+            if(p1Pos === 100) return showWin("KAMU MENANG!");
             
-            if(p1Pos === 100) return showWin(true); // Player Menang
-
-            document.getElementById('turn-display').innerText = "Giliran: AI...";
-            setTimeout(aiTurn, 1500);
-        }, 1100);
+            setTimeout(aiTurn, 1000);
+        }, 1300);
     }
 
     function aiTurn() {
-        let roll = Math.floor(Math.random() * 6) + 1;
-        p2Pos = Math.min(100, p2Pos + roll);
+        let move = Math.floor(Math.random()*6)+1;
+        p2Pos = Math.min(100, p2Pos + move);
         checkJumps('p2');
-        if(p2Pos === 100) return showWin(false); // AI Menang
-        document.getElementById('turn-display').innerText = "Giliran: Pemain";
+        if(p2Pos === 100) return showWin("AI MENANG!");
         document.getElementById('btn-roll').disabled = false;
     }
 
     function checkJumps(pid) {
         let pos = pid === 'p1' ? p1Pos : p2Pos;
-        if (jumps[pos]) {
-            if (jumps[pos] < pos && pid === 'p1' && isProtected) {
+        if(jumps[pos]) {
+            if(jumps[pos] < pos && pid === 'p1' && isProtected) {
                 isProtected = false;
-                document.getElementById('log').innerText = "Shield Menahan Ular!";
+                document.getElementById('log').innerText = "Shield Aktif!";
             } else {
                 if(pid === 'p1') p1Pos = jumps[pos]; else p2Pos = jumps[pos];
-                document.getElementById('log').innerText = jumps[pos] > pos ? "Yeay! Naik Tangga!" : "Oh no! Kena Ular!";
             }
         }
-        moveBidak('p1', p1Pos); moveBidak('p2', p2Pos);
+        updateBidak();
     }
 
-    function moveBidak(id, pos) {
-        const cell = document.getElementById('cell-' + pos);
-        const bRect = document.getElementById('board').getBoundingClientRect();
-        const cRect = cell.getBoundingClientRect();
-        const bidak = document.getElementById(id);
-        // Posisikan bidak di tengah kotak pixel
-        bidak.style.left = (cRect.left - bRect.left + 10) + 'px';
-        bidak.style.top = (cRect.top - bRect.top + 10) + 'px';
+    function updateBidak() {
+        const bR = board.getBoundingClientRect();
+        [ ['p1', p1Pos], ['p2', p2Pos] ].forEach(d => {
+            const cR = document.getElementById('cell-'+d[1]).getBoundingClientRect();
+            const el = document.getElementById(d[0]);
+            el.style.left = (cR.left - bR.left + 10) + 'px';
+            el.style.top = (cR.top - bR.top + 10) + 'px';
+        });
     }
 
     function renderCards() {
         const list = document.getElementById('card-list');
-        list.innerHTML = "";
-        inventory.forEach((card, index) => {
+        list.innerHTML = '';
+        inventory.forEach((c, i) => {
             const div = document.createElement('div');
             div.className = 'card-item';
-            div.innerHTML = `<h4>${card.title}</h4><p>${card.desc}</p>`;
+            div.innerHTML = `<strong>${c.title}</strong><br><small>${c.desc}</small>`;
             div.onclick = () => {
-                if(card.type === "swap") [p1Pos, p2Pos] = [p2Pos, p1Pos];
-                if(card.type === "push") p2Pos = Math.max(1, p2Pos - 5);
-                if(card.type === "shield") isProtected = true;
-                inventory.splice(index, 1);
-                moveBidak('p1', p1Pos); moveBidak('p2', p2Pos);
-                renderCards();
+                if(c.type === 'swap') [p1Pos, p2Pos] = [p2Pos, p1Pos];
+                if(c.type === 'push') p2Pos = Math.max(1, p2Pos-5);
+                inventory.splice(i, 1); updateBidak(); renderCards();
             };
             list.appendChild(div);
         });
     }
 
-    function showWin(isPlayerWin) {
+    function showWin(txt) {
         document.getElementById('win-screen').classList.remove('hidden');
-        document.getElementById('winner-name').innerText = isPlayerWin ? "KAMU MENANG!" : "AI MENANG!";
-        
-        const winnerToken = document.getElementById('winner-token');
-        winnerToken.className = 'pixel-char'; // Reset
-        // Tampilkan karakter pemenang di layar menang
-        if(isPlayerWin) {
-            winnerToken.classList.add(charClasses[playerCharIndex]);
-        } else {
-            winnerToken.classList.add(charClasses[1 - playerCharIndex]);
-        }
+        document.getElementById('winner-name').innerText = txt;
     }
 </script>
 </body>

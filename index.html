@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Ular Tangga Luar Biasa</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; background: #2c3e50; color: white; margin: 0; padding: 20px; }
+        #game-container { display: flex; gap: 20px; }
+        #board { display: grid; grid-template-columns: repeat(10, 50px); grid-template-rows: repeat(10, 50px); border: 5px solid #ecf0f1; background: #fff; }
+        .cell { width: 50px; height: 50px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #333; position: relative; }
+        .player { width: 20px; height: 20px; border-radius: 50%; position: absolute; z-index: 10; transition: all 0.3s; }
+        #p1 { background: #3498db; box-shadow: 0 0 10px #3498db; }
+        #p2 { background: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
+        #ui-panel { width: 300px; padding: 20px; background: #34495e; border-radius: 10px; }
+        .card { background: #9b59b6; padding: 10px; margin: 5px 0; cursor: pointer; border-radius: 5px; text-align: center; }
+        .card:hover { background: #8e44ad; }
+        button { width: 100%; padding: 10px; font-weight: bold; cursor: pointer; background: #f1c40f; border: none; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="board"></div>
+
+        <div id="ui-panel">
+            <h2>Giliran: <span id="turn-display">Pemain</span></h2>
+            <div style="background: #1a252f; padding: 10px; margin-bottom: 10px;">
+                Dadu: <span id="dice-num">0</span> | Aksi: <span id="dice-action">-</span>
+            </div>
+            <button onclick="playTurn()">KOCOK DADU</button>
+            
+            <h3>Kartu Kamu (Klik):</h3>
+            <div id="card-list"></div>
+            
+            <p id="log" style="font-size: 14px; color: #bdc3c7;"></p>
+        </div>
+    </div>
+
+    <script>
+        // Data JSON-like (Ular & Tangga)
+        const jumps = { 3: 22, 10: 31, 14: 4, 27: 5, 56: 19, 62: 81, 99: 10 };
+        
+        let p1Pos = 1;
+        let p2Pos = 1;
+        let inventory = ["Dorongan Maut", "Tukar Nasib"];
+        let isProtected = false;
+
+        // Inisialisasi Papan
+        const board = document.getElementById('board');
+        for (let i = 100; i >= 1; i--) {
+            let displayNum = i;
+            // Logika Zig-zag (Opsional untuk visual sederhana)
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.id = 'cell-' + i;
+            cell.innerText = i;
+            board.appendChild(cell);
+        }
+
+        function updatePositions() {
+            // Hapus bidak lama
+            const oldP1 = document.getElementById('p1'); if(oldP1) oldP1.remove();
+            const oldP2 = document.getElementById('p2'); if(oldP2) oldP2.remove();
+
+            // Taruh bidak baru
+            const c1 = document.getElementById('cell-' + p1Pos);
+            const c2 = document.getElementById('cell-' + p2Pos);
+            c1.innerHTML += '<div id="p1" class="player"></div>';
+            c2.innerHTML += '<div id="p2" class="player"></div>';
+        }
+
+        function playTurn() {
+            // 1. Kocok Dadu
+            let roll = Math.floor(Math.random() * 6) + 1;
+            let actions = ["⚡", "🛡️", "🃏", "🎯", "🔄", "💀"];
+            let action = actions[Math.floor(Math.random() * actions.length)];
+            
+            document.getElementById('dice-num').innerText = roll;
+            document.getElementById('dice-action').innerText = action;
+
+            // 2. Efek Dadu
+            let move = roll;
+            if (action === "⚡") move += 2;
+            if (action === "🛡️") isProtected = true;
+            if (action === "🃏") { inventory.push("Pawang Ular"); renderCards(); }
+            
+            p1Pos += move;
+            if (p1Pos > 100) p1Pos = 100;
+
+            // 3. Cek Ular/Tangga
+            if (jumps[p1Pos]) {
+                if (jumps[p1Pos] < p1Pos && isProtected) {
+                    document.getElementById('log').innerText = "Kebal Ular aktif!";
+                    isProtected = false;
+                } else {
+                    p1Pos = jumps[p1Pos];
+                }
+            }
+
+            updatePositions();
+            renderCards();
+            
+            // 4. Giliran AI (Otomatis setelah 1 detik)
+            document.getElementById('turn-display').innerText = "AI...";
+            setTimeout(aiTurn, 1000);
+        }
+
+        function aiTurn() {
+            let roll = Math.floor(Math.random() * 6) + 1;
+            p2Pos += roll;
+            if (p2Pos > 100) p2Pos = 100;
+            if (jumps[p2Pos]) p2Pos = jumps[p2Pos];
+            
+            updatePositions();
+            document.getElementById('turn-display').innerText = "Pemain";
+        }
+
+        function renderCards() {
+            const list = document.getElementById('card-list');
+            list.innerHTML = "";
+            inventory.forEach((card, index) => {
+                let div = document.createElement('div');
+                div.className = 'card';
+                div.innerText = card;
+                div.onclick = () => useCard(index);
+                list.appendChild(div);
+            });
+        }
+
+        function useCard(index) {
+            let cardName = inventory[index];
+            if (cardName === "Tukar Nasib") {
+                [p1Pos, p2Pos] = [p2Pos, p1Pos];
+            } else if (cardName === "Dorongan Maut") {
+                p2Pos -= 5; if (p2Pos < 1) p2Pos = 1;
+            }
+            inventory.splice(index, 1);
+            updatePositions();
+            renderCards();
+        }
+
+        updatePositions();
+        renderCards();
+    </script>
+</body>
+</html>

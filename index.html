@@ -2,261 +2,177 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Pixel Tangga Luar Biasa - Fixed Edition</title>
+    <title>Pixel Tangga Luar Biasa</title>
     <style>
-        :root { --bg-color: #1a1a2e; --panel-color: #16213e; --accent-color: #e94560; }
-        body { font-family: 'Segoe UI', sans-serif; display: flex; background: var(--bg-color); color: white; margin: 0; padding: 20px; justify-content: center; height: 100vh; overflow: hidden; }
+        :root { --bg: #1a1a2e; --accent: #e94560; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        /* OVERLAYS */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
-        
-        /* KARAKTER PIXEL CSS */
-        .pixel-char { width: 40px; height: 40px; image-rendering: pixelated; position: relative; cursor: pointer; transition: transform 0.2s; }
-        .pixel-char:hover { transform: scale(1.1); }
-        .char-selected { border: 4px solid gold; border-radius: 5px; box-shadow: 0 0 15px gold; }
 
-        .char-umbrella {
-            background: 
-                linear-gradient(to right, #f1c40f 20%, transparent 20%, transparent 80%, #f1c40f 80%),
-                linear-gradient(to bottom, transparent 10%, #f1c40f 10%, #f1c40f 30%, transparent 30%),
-                linear-gradient(to right, transparent 40%, #e67e22 40%, #e67e22 60%, transparent 60%),
-                linear-gradient(to right, transparent 30%, #3498db 30%, #3498db 70%, transparent 70%),
-                linear-gradient(to bottom, transparent 60%, #3498db 60%, #3498db 90%, transparent 90%),
-                linear-gradient(to right, transparent 40%, #ffdbac 40%, #ffdbac 60%, transparent 60%);
+        /* CHARACTER SELECT */
+        .char-box { display: flex; gap: 30px; margin: 20px; }
+        .char-option { 
+            width: 100px; height: 100px; background: #16213e; border: 3px solid #333; 
+            border-radius: 15px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
         }
-
-        .char-panda {
-            background: 
-                linear-gradient(to right, black 20%, transparent 20%, transparent 80%, black 80%),
-                linear-gradient(to right, transparent 20%, white 20%, white 80%, transparent 80%),
-                linear-gradient(to bottom, transparent 20%, white 20%, white 80%, transparent 80%),
-                linear-gradient(to right, transparent 30%, black 30%, black 45%, transparent 45%, transparent 55%, black 55%, black 70%, transparent 70%),
-                linear-gradient(to right, transparent 45%, black 45%, black 55%, transparent 55%);
-            background-color: white; border-radius: 5px;
-        }
+        .char-option img { width: 70px; height: 70px; image-rendering: pixelated; }
+        .char-option:hover { border-color: var(--accent); transform: scale(1.1); }
+        .selected { border-color: gold !important; box-shadow: 0 0 15px gold; }
 
         /* GAME BOARD */
-        #game-container { display: flex; gap: 30px; }
-        #board-wrapper { position: relative; width: 600px; height: 600px; background: #fff; border: 8px solid #0f3460; border-radius: 10px; }
-        #board { display: grid; grid-template-columns: repeat(10, 60px); grid-template-rows: repeat(10, 60px); width: 100%; height: 100%; }
-        #svg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-        .cell { width: 60px; height: 60px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #ccc; font-weight: bold; }
+        #game-container { display: flex; gap: 20px; }
+        #board-wrapper { position: relative; width: 550px; height: 550px; background: white; border: 5px solid #0f3460; border-radius: 8px; }
+        #board { display: grid; grid-template-columns: repeat(10, 55px); grid-template-rows: repeat(10, 55px); }
+        .cell { width: 55px; height: 55px; border: 0.5px solid #eee; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; }
+        #svg-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
 
-        /* DADU 3D FIXED */
-        .dice-area { display: flex; gap: 30px; justify-content: center; margin-bottom: 25px; perspective: 1000px; }
-        .cube { width: 60px; height: 60px; position: relative; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1); }
-        .cube div { position: absolute; width: 60px; height: 60px; background: white; border: 2px solid #ddd; color: black; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-radius: 8px; box-sizing: border-box; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
-        .action-cube div { background: var(--accent-color); color: white; border-color: #950740; }
-        
-        /* Koordinat Sisi Dadu */
-        .side-1 { transform: translateZ(30px); }
-        .side-6 { transform: rotateY(180deg) translateZ(30px); }
-        .side-3 { transform: rotateY(90deg) translateZ(30px); }
-        .side-4 { transform: rotateY(-90deg) translateZ(30px); }
-        .side-2 { transform: rotateX(-90deg) translateZ(30px); }
-        .side-5 { transform: rotateX(90deg) translateZ(30px); }
+        /* BIDAK (THE CHARACTERS) */
+        .bidak { 
+            width: 45px; height: 45px; position: absolute; z-index: 10; 
+            transition: all 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            image-rendering: pixelated;
+        }
 
-        /* UI & KARTU */
-        .player-token { width: 40px; height: 40px; position: absolute; z-index: 10; transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1); filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
-        #ui-panel { width: 350px; background: var(--panel-color); padding: 20px; border-radius: 15px; border-left: 5px solid var(--accent-color); }
-        .card-item { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 12px; border-radius: 10px; border: 2px solid gold; cursor: pointer; margin-bottom: 10px; }
-        .btn-main { background: var(--accent-color); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; box-shadow: 0 5px #950740; }
-        .btn-main:disabled { background: #444; box-shadow: none; opacity: 0.6; }
+        /* DICE UI */
+        #ui-panel { width: 300px; background: #16213e; padding: 20px; border-radius: 15px; }
+        .dice-box { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; perspective: 1000px; }
+        .cube { width: 50px; height: 50px; position: relative; transform-style: preserve-3d; transition: transform 1.2s; }
+        .cube div { position: absolute; width: 50px; height: 50px; background: white; border: 2px solid #ccc; color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 5px; }
+        .act-dice div { background: var(--accent); color: white; }
+
+        /* SISI DADU */
+        .s1 { transform: translateZ(25px); } .s6 { transform: rotateY(180deg) translateZ(25px); }
+        .s3 { transform: rotateY(90deg) translateZ(25px); } .s4 { transform: rotateY(-90deg) translateZ(25px); }
+        .s2 { transform: rotateX(-90deg) translateZ(25px); } .s5 { transform: rotateX(90deg) translateZ(25px); }
+
+        .btn-roll { background: var(--accent); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; box-shadow: 0 4px #950740; }
+        .btn-roll:active { transform: translateY(4px); box-shadow: none; }
     </style>
 </head>
 <body>
 
-<div id="start-screen" class="overlay">
-    <h1>🎲 PIXEL TANGGA<br><span style="color:var(--accent-color)">LUAR BIASA</span></h1>
-    <button class="btn-main" style="width:200px" onclick="showCharSelect()">PILIH KARAKTER</button>
-</div>
-
-<div id="char-screen" class="overlay hidden">
-    <h2>PILIH KARAKTER</h2>
-    <div style="display: flex; gap: 40px; margin: 30px 0;">
-        <div class="pixel-char char-umbrella" id="char-0" onclick="selectChar(0)"></div>
-        <div class="pixel-char char-panda" id="char-1" onclick="selectChar(1)"></div>
+<div id="char-overlay" class="overlay">
+    <h2>Pilih Karakter Kamu</h2>
+    <div class="char-box">
+        <div class="char-option" onclick="selectChar(0)" id="opt0">
+            <img src="https://api.iconify.design/pixelarticons:human-handsup.svg?color=%233498db" alt="Girl">
+            <p style="position:absolute; bottom:-25px; font-size:12px;">Gadis</p>
+        </div>
+        <div class="char-option" onclick="selectChar(1)" id="opt1">
+            <img src="https://api.iconify.design/pixelarticons:android.svg?color=%232ecc71" alt="Panda">
+            <p style="position:absolute; bottom:-25px; font-size:12px;">Panda Bot</p>
+        </div>
     </div>
-    <button class="btn-main" id="btn-confirm" style="width:250px" onclick="startGame()" disabled>MULAI GAME</button>
-</div>
-
-<div id="win-screen" class="overlay hidden">
-    <h1 id="winner-name" style="color:gold">MENANG!</h1>
-    <button class="btn-main" style="width:200px" onclick="location.reload()">MAIN LAGI</button>
+    <button class="btn-roll" style="width:200px; margin-top:40px;" onclick="start()" id="btn-start" disabled>MAIN SEKARANG</button>
 </div>
 
 <div id="game-container" class="hidden">
     <div id="board-wrapper">
         <svg id="svg-layer"></svg>
         <div id="board"></div>
-        <div id="p1" class="player-token"></div>
-        <div id="p2" class="player-token"></div>
+        <img id="p1" class="bidak" src="">
+        <img id="p2" class="bidak" src="">
     </div>
 
     <div id="ui-panel">
-        <div class="dice-area">
-            <div class="cube" id="cube-num">
-                <div class="side-1">1</div><div class="side-6">6</div><div class="side-3">3</div>
-                <div class="side-4">4</div><div class="side-2">2</div><div class="side-5">5</div>
+        <div class="dice-box">
+            <div class="cube" id="cube1">
+                <div class="s1">1</div><div class="s6">6</div><div class="s3">3</div><div class="s4">4</div><div class="s2">2</div><div class="s5">5</div>
             </div>
-            <div class="cube action-cube" id="cube-act">
-                <div class="side-1">⚡</div><div class="side-6">💀</div><div class="side-3">🃏</div>
-                <div class="side-4">🎯</div><div class="side-2">🛡️</div><div class="side-5">🔄</div>
+            <div class="cube act-dice" id="cube2">
+                <div class="s1">⚡</div><div class="s6">💀</div><div class="s3">🃏</div><div class="s4">🎯</div><div class="s2">🛡️</div><div class="s5">🔄</div>
             </div>
         </div>
-        <button class="btn-main" id="btn-roll" onclick="playTurn()">KOCOK DADU!</button>
-        <div id="card-list" style="margin-top:20px"></div>
-        <p id="log" style="text-align:center; color:cyan; font-size:14px"></p>
+        <button class="btn-roll" id="btn-kocok" onclick="kocok()">KOCOK DADU</button>
+        <p id="log" style="text-align:center; font-size:14px; color:cyan; margin-top:20px;"></p>
     </div>
 </div>
 
 <script>
-    let jumps = {}, p1Pos = 1, p2Pos = 1;
-    let isProtected = false, playerCharIdx = -1;
-    let rotNum = {x:0, y:0}, rotAct = {x:0, y:0};
-    
-    const charClasses = ['char-umbrella', 'char-panda'];
-    const inventory = [
-        { title: "Tukar Nasib", type: "swap", desc: "Tukar posisi dengan lawan." },
-        { title: "Dorongan Maut", type: "push", desc: "Lawan mundur 5 petak." }
+    let p1Pos = 1, p2Pos = 1, jumps = {};
+    let chosenIdx = -1, r1 = 0, r2 = 0;
+    const chars = [
+        "https://api.iconify.design/pixelarticons:human-run.svg?color=%233498db", // Gadis
+        "https://api.iconify.design/pixelarticons:mood-happy.svg?color=%232ecc71"  // Panda/Bot imut
     ];
 
-    // Build Grid
-    const board = document.getElementById('board');
+    // Buat Papan
     for (let i = 100; i >= 1; i--) {
         const cell = document.createElement('div');
         cell.className = 'cell'; cell.id = 'cell-' + i; cell.innerText = i;
         let row = Math.floor((i-1)/10), col = (i-1)%10;
         cell.style.order = (9-row)*10 + (row % 2 === 0 ? col : 9-col);
-        board.appendChild(cell);
-    }
-
-    function showCharSelect() {
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('char-screen').classList.remove('hidden');
+        document.getElementById('board').appendChild(cell);
     }
 
     function selectChar(idx) {
-        playerCharIdx = idx;
-        document.querySelectorAll('.pixel-char').forEach(el => el.classList.remove('char-selected'));
-        document.getElementById('char-' + idx).classList.add('char-selected');
-        document.getElementById('btn-confirm').disabled = false;
+        chosenIdx = idx;
+        document.getElementById('opt0').classList.remove('selected');
+        document.getElementById('opt1').classList.remove('selected');
+        document.getElementById('opt' + idx).classList.add('selected');
+        document.getElementById('btn-start').disabled = false;
     }
 
-    function startGame() {
-        document.getElementById('char-screen').classList.add('hidden');
+    function start() {
+        document.getElementById('char-overlay').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
-        document.getElementById('p1').classList.add(charClasses[playerCharIdx]);
-        document.getElementById('p2').classList.add(charClasses[1 - playerCharIdx]);
+        document.getElementById('p1').src = chars[chosenIdx];
+        document.getElementById('p2').src = chars[1 - chosenIdx];
         
-        randomizeJumps();
-        updateBidak();
-        renderCards();
-    }
-
-    function randomizeJumps() {
-        jumps = {};
-        for(let i=0; i<10; i++) {
-            let s = Math.floor(Math.random()*85)+5, e = Math.floor(Math.random()*85)+5;
-            if(Math.abs(s-e)>15 && !jumps[s]) jumps[s] = e;
+        // Buat Tangga/Ular
+        for(let i=0; i<8; i++){
+            let s = Math.floor(Math.random()*80)+10, e = Math.floor(Math.random()*80)+10;
+            if(Math.abs(s-e)>15) jumps[s] = e;
         }
-        drawVisuals();
+        drawJumps();
+        updatePos();
     }
 
-    function drawVisuals() {
-        const svg = document.getElementById('svg-layer'), bR = board.getBoundingClientRect();
-        svg.innerHTML = '';
-        for(let s in jumps) {
-            let e = jumps[s], sR = document.getElementById('cell-'+s).getBoundingClientRect(), eR = document.getElementById('cell-'+e).getBoundingClientRect();
-            let x1 = sR.left-bR.left+30, y1 = sR.top-bR.top+30, x2 = eR.left-bR.left+30, y2 = eR.top-bR.top+30;
-            let color = e > s ? "#2ecc71" : "#e74c3c";
-            svg.innerHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="6" stroke-linecap="round" opacity="0.5"/>`;
+    function drawJumps() {
+        const svg = document.getElementById('svg-layer'), b = board.getBoundingClientRect();
+        for(let s in jumps){
+            let sR = document.getElementById('cell-'+s).getBoundingClientRect();
+            let eR = document.getElementById('cell-'+jumps[s]).getBoundingClientRect();
+            let color = jumps[s] > s ? "#2ecc71" : "#e74c3c";
+            svg.innerHTML += `<line x1="${sR.left-b.left+27}" y1="${sR.top-b.top+27}" x2="${eR.left-b.left+27}" y2="${eR.top-b.top+27}" stroke="${color}" stroke-width="4" stroke-linecap="round" opacity="0.4"/>`;
         }
     }
 
-    // FIXED DICE ANIMATION
-    function rollDice(id, resultIdx, isAction) {
-        const cube = document.getElementById(id);
-        const sides = [
-            [0,0], [90,0], [0,-90], [0,90], [-90,0], [0,180] // 1, 2, 3, 4, 5, 6
-        ];
-        let rot = isAction ? rotAct : rotNum;
-        rot.x += 720 + sides[resultIdx][0] - (rot.x % 360);
-        rot.y += 720 + sides[resultIdx][1] - (rot.y % 360);
-        cube.style.transform = `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
-    }
-
-    function playTurn() {
-        document.getElementById('btn-roll').disabled = true;
-        let r1 = Math.floor(Math.random()*6), r2 = Math.floor(Math.random()*6);
-        rollDice('cube-num', r1, false); rollDice('cube-act', r2, true);
+    function kocok() {
+        document.getElementById('btn-kocok').disabled = true;
+        let n1 = Math.floor(Math.random()*6), n2 = Math.floor(Math.random()*6);
+        
+        // Rotasi Dadu
+        r1 += 720; r2 += 720;
+        const rots = [[0,0],[90,0],[0,-90],[0,90],[-90,0],[0,180]];
+        document.getElementById('cube1').style.transform = `rotateX(${r1+rots[n1][0]}deg) rotateY(${r1+rots[n1][1]}deg)`;
+        document.getElementById('cube2').style.transform = `rotateX(${r2+rots[n2][0]}deg) rotateY(${r2+rots[n2][1]}deg)`;
 
         setTimeout(() => {
-            let move = r1 + 1;
-            const acts = ["⚡", "🛡️", "🃏", "🎯", "🔄", "💀"];
-            let a = acts[r2];
-            if(a === "⚡") move += 2;
-            if(a === "🛡️") isProtected = true;
-            if(a === "💀") move = Math.max(1, move-2);
+            p1Pos = Math.min(100, p1Pos + n1 + 1);
+            if(jumps[p1Pos]) p1Pos = jumps[p1Pos];
+            updatePos();
+            if(p1Pos === 100) alert("Kamu Menang!");
             
-            p1Pos = Math.min(100, p1Pos + move);
-            checkJumps('p1');
-            if(p1Pos === 100) return showWin("KAMU MENANG!");
-            
-            setTimeout(aiTurn, 1000);
-        }, 1300);
+            setTimeout(() => {
+                p2Pos = Math.min(100, p2Pos + Math.floor(Math.random()*6)+1);
+                if(jumps[p2Pos]) p2Pos = jumps[p2Pos];
+                updatePos();
+                document.getElementById('btn-kocok').disabled = false;
+            }, 800);
+        }, 1200);
     }
 
-    function aiTurn() {
-        let move = Math.floor(Math.random()*6)+1;
-        p2Pos = Math.min(100, p2Pos + move);
-        checkJumps('p2');
-        if(p2Pos === 100) return showWin("AI MENANG!");
-        document.getElementById('btn-roll').disabled = false;
-    }
-
-    function checkJumps(pid) {
-        let pos = pid === 'p1' ? p1Pos : p2Pos;
-        if(jumps[pos]) {
-            if(jumps[pos] < pos && pid === 'p1' && isProtected) {
-                isProtected = false;
-                document.getElementById('log').innerText = "Shield Aktif!";
-            } else {
-                if(pid === 'p1') p1Pos = jumps[pos]; else p2Pos = jumps[pos];
-            }
-        }
-        updateBidak();
-    }
-
-    function updateBidak() {
-        const bR = board.getBoundingClientRect();
-        [ ['p1', p1Pos], ['p2', p2Pos] ].forEach(d => {
-            const cR = document.getElementById('cell-'+d[1]).getBoundingClientRect();
-            const el = document.getElementById(d[0]);
-            el.style.left = (cR.left - bR.left + 10) + 'px';
-            el.style.top = (cR.top - bR.top + 10) + 'px';
+    function updatePos() {
+        const b = board.getBoundingClientRect();
+        [p1Pos, p2Pos].forEach((p, i) => {
+            const c = document.getElementById('cell-'+p).getBoundingClientRect();
+            const el = document.getElementById('p'+(i+1));
+            el.style.left = (c.left - b.left + 5) + 'px';
+            el.style.top = (c.top - b.top + 5) + 'px';
         });
-    }
-
-    function renderCards() {
-        const list = document.getElementById('card-list');
-        list.innerHTML = '';
-        inventory.forEach((c, i) => {
-            const div = document.createElement('div');
-            div.className = 'card-item';
-            div.innerHTML = `<strong>${c.title}</strong><br><small>${c.desc}</small>`;
-            div.onclick = () => {
-                if(c.type === 'swap') [p1Pos, p2Pos] = [p2Pos, p1Pos];
-                if(c.type === 'push') p2Pos = Math.max(1, p2Pos-5);
-                inventory.splice(i, 1); updateBidak(); renderCards();
-            };
-            list.appendChild(div);
-        });
-    }
-
-    function showWin(txt) {
-        document.getElementById('win-screen').classList.remove('hidden');
-        document.getElementById('winner-name').innerText = txt;
     }
 </script>
 </body>
